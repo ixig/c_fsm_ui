@@ -7,18 +7,21 @@ import { ModalShell, Field } from "./StateEditorModal";
 export function TransitionEditorModal() {
   const modal = useFsmStore((s) => s.modal);
   const edge = useFsmStore((s) => {
-    if (s.modal.kind !== "transition") return null;
-    return s.edges.find((e) => e.id === s.modal.edgeId) ?? null;
+    const m = s.modal;
+    if (m.kind !== "transition") return null;
+    return s.edges.find((e) => e.id === m.edgeId) ?? null;
   });
   const sourceName = useFsmStore((s) => {
-    if (s.modal.kind !== "transition") return "";
-    const e = s.edges.find((ed) => ed.id === s.modal.edgeId);
+    const m = s.modal;
+    if (m.kind !== "transition") return "";
+    const e = s.edges.find((ed) => ed.id === m.edgeId);
     if (!e) return "";
     return s.nodes.find((n) => n.id === e.source)?.data.name ?? "?";
   });
   const targetName = useFsmStore((s) => {
-    if (s.modal.kind !== "transition") return "";
-    const e = s.edges.find((ed) => ed.id === s.modal.edgeId);
+    const m = s.modal;
+    if (m.kind !== "transition") return "";
+    const e = s.edges.find((ed) => ed.id === m.edgeId);
     if (!e) return "";
     return s.nodes.find((n) => n.id === e.target)?.data.name ?? "?";
   });
@@ -33,10 +36,12 @@ export function TransitionEditorModal() {
 
   useEffect(() => {
     if (edge) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setPriority(edge.data?.priority !== undefined ? String(edge.data.priority) : "");
       setTrigger(edge.data?.trigger ?? "");
       setGuard(edge.data?.guard ?? "");
       setAction(edge.data?.action ?? "");
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [edge]);
 

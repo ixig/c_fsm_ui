@@ -23,11 +23,13 @@ export function StateEditorModal() {
 
   useEffect(() => {
     if (node) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setName(node.data.name);
       setOnEnter(node.data.onEnter ?? "");
       setOnExit(node.data.onExit ?? "");
       setTimeoutMs(node.data.timeout_ms !== undefined ? String(node.data.timeout_ms) : "");
       setIsInitial(!!node.data.isInitial);
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [node]);
 

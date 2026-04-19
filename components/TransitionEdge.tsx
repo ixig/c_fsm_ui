@@ -105,13 +105,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     <>
       <BaseEdge
         path={path}
-        markerEnd={
-          typeof markerEnd === "string"
-            ? markerEnd
-            : markerEnd
-              ? { ...markerEnd, color: strokeColor }
-              : undefined
-        }
+        markerEnd={markerEnd}
         style={{
           stroke: strokeColor,
           strokeWidth: isHighlighted ? 2.5 : 1.75,
