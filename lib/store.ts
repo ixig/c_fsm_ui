@@ -27,6 +27,8 @@ type FsmStore = {
   nodes: StateNode[];
   edges: TransitionEdge[];
   modal: ModalState;
+  hoveredEdgeId: string | null;
+  hoveredNodeId: string | null;
 
   setNodes: (nodes: StateNode[]) => void;
   setEdges: (edges: TransitionEdge[]) => void;
@@ -41,6 +43,8 @@ type FsmStore = {
 
   updateTransition: (id: string, patch: Partial<TransitionEdgeData>) => void;
   deleteTransition: (id: string) => void;
+  setHoveredEdge: (id: string | null) => void;
+  setHoveredNode: (id: string | null) => void;
 
   openStateModal: (nodeId: string) => void;
   openTransitionModal: (edgeId: string) => void;
@@ -54,6 +58,8 @@ export const useFsmStore = create<FsmStore>((set, get) => ({
   nodes: [],
   edges: [],
   modal: { kind: "none" },
+  hoveredEdgeId: null,
+  hoveredNodeId: null,
 
   setNodes: (nodes) => set({ nodes }),
   setEdges: (edges) => set({ edges }),
@@ -107,11 +113,17 @@ export const useFsmStore = create<FsmStore>((set, get) => ({
     })),
 
   deleteState: (id) =>
-    set((s) => ({
-      nodes: s.nodes.filter((n) => n.id !== id),
-      edges: s.edges.filter((e) => e.source !== id && e.target !== id),
-      modal: { kind: "none" },
-    })),
+    set((s) => {
+      const remainingEdges = s.edges.filter((e) => e.source !== id && e.target !== id);
+      const wasHoveredEdgeDeleted = s.hoveredEdgeId && !remainingEdges.some(e => e.id === s.hoveredEdgeId);
+      return {
+        nodes: s.nodes.filter((n) => n.id !== id),
+        edges: remainingEdges,
+        modal: { kind: "none" },
+        hoveredEdgeId: wasHoveredEdgeDeleted ? null : s.hoveredEdgeId,
+        hoveredNodeId: s.hoveredNodeId === id ? null : s.hoveredNodeId,
+      };
+    }),
 
   setInitialState: (id) =>
     set((s) => ({
@@ -132,12 +144,16 @@ export const useFsmStore = create<FsmStore>((set, get) => ({
     set((s) => ({
       edges: s.edges.filter((e) => e.id !== id),
       modal: { kind: "none" },
+      hoveredEdgeId: s.hoveredEdgeId === id ? null : s.hoveredEdgeId,
     })),
+
+  setHoveredEdge: (id) => set({ hoveredEdgeId: id }),
+  setHoveredNode: (id) => set({ hoveredNodeId: id }),
 
   openStateModal: (nodeId) => set({ modal: { kind: "state", nodeId } }),
   openTransitionModal: (edgeId) => set({ modal: { kind: "transition", edgeId } }),
   closeModal: () => set({ modal: { kind: "none" } }),
 
   replaceAll: (nodes, edges) => set({ nodes, edges, modal: { kind: "none" } }),
-  clear: () => set({ nodes: [], edges: [], modal: { kind: "none" } }),
+  clear: () => set({ nodes: [], edges: [], modal: { kind: "none" }, hoveredEdgeId: null, hoveredNodeId: null }),
 }));

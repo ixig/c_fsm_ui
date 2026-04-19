@@ -27,6 +27,13 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
 
   const { screenToFlowPosition } = useReactFlow();
   const updateTransition = useFsmStore((s) => s.updateTransition);
+  const setHoveredEdge = useFsmStore((s) => s.setHoveredEdge);
+  const hoveredEdgeId = useFsmStore((s) => s.hoveredEdgeId);
+  const hoveredNodeId = useFsmStore((s) => s.hoveredNodeId);
+
+  const isHovered = hoveredEdgeId === id;
+  const isSourceHovered = hoveredNodeId === props.source;
+  const isHighlighted = selected || isHovered || isSourceHovered;
 
   const [path, labelX, labelY] = getBezierPath({
     sourceX,
@@ -90,14 +97,24 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
   const offsetX = data?.labelOffset?.x || 0;
   const offsetY = data?.labelOffset?.y || 0;
 
+  const highlightColor = "#2563eb";
+  const defaultColor = "#334155";
+  const strokeColor = isHighlighted ? highlightColor : defaultColor;
+
   return (
     <>
       <BaseEdge
         path={path}
-        markerEnd={markerEnd}
+        markerEnd={
+          typeof markerEnd === "string"
+            ? markerEnd
+            : markerEnd
+              ? { ...markerEnd, color: strokeColor }
+              : undefined
+        }
         style={{
-          stroke: selected ? "#2563eb" : "#334155",
-          strokeWidth: selected ? 2.5 : 1.75,
+          stroke: strokeColor,
+          strokeWidth: isHighlighted ? 2.5 : 1.75,
           fill: "none",
         }}
       />
@@ -111,7 +128,11 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
             }}
             onMouseDown={onMouseDown}
             onClick={onLabelClick}
-            className="nopan bg-white px-2 py-1 text-[11px] font-mono rounded border border-neutral-200 shadow-sm flex flex-col items-center leading-tight cursor-move select-none"
+            onMouseEnter={() => setHoveredEdge(id)}
+            onMouseLeave={() => setHoveredEdge(null)}
+            className={`nopan bg-white px-2 py-1 text-[11px] font-mono rounded border shadow-sm flex flex-col items-center leading-tight cursor-move select-none transition-colors ${
+              isHighlighted ? "border-blue-400" : "border-neutral-200 hover:border-blue-300"
+            }`}
           >
             {data?.trigger && <div>{data.trigger}</div>}
             {data?.guard && <div className="text-neutral-500">[{data.guard}]</div>}

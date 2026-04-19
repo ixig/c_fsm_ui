@@ -3,15 +3,20 @@
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { memo } from "react";
 import type { StateNode as StateNodeType } from "@/lib/types";
+import { useFsmStore } from "@/lib/store";
 
 export const STATE_NODE_MIN_WIDTH = 160;
 export const STATE_NODE_MIN_HEIGHT = 64;
 
-function StateNodeImpl({ data, selected }: NodeProps<StateNodeType>) {
+function StateNodeImpl({ id, data, selected }: NodeProps<StateNodeType>) {
+  const setHoveredNode = useFsmStore((s) => s.setHoveredNode);
+
   return (
     <div
-      className={`relative rounded-xl border-2 bg-white shadow-sm flex items-center justify-center text-center px-5 py-3 ${
-        selected ? "border-blue-500" : "border-neutral-700"
+      onMouseEnter={() => setHoveredNode(id)}
+      onMouseLeave={() => setHoveredNode(null)}
+      className={`relative rounded-xl border-2 bg-white shadow-sm flex items-center justify-center text-center px-5 py-3 transition-colors ${
+        selected ? "border-blue-500" : "border-neutral-700 hover:border-blue-400"
       }`}
       style={{ minWidth: STATE_NODE_MIN_WIDTH, minHeight: STATE_NODE_MIN_HEIGHT }}
     >
