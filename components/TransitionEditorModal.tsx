@@ -53,6 +53,10 @@ export function TransitionEditorModal() {
     if (window.confirm("Delete this transition?")) deleteTransition(edge.id);
   };
 
+  const resetPosition = () => {
+    updateTransition(edge.id, { labelOffset: undefined });
+  };
+
   return (
     <ModalShell onClose={closeModal} title="Edit Transition">
       <p className="text-xs text-neutral-500">
@@ -86,7 +90,16 @@ export function TransitionEditorModal() {
         />
       </Field>
 
-      <div className="flex justify-between pt-2">
+      {edge.data?.labelOffset && (
+        <button
+          onClick={resetPosition}
+          className="text-[10px] text-blue-600 hover:underline mt-1"
+        >
+          Reset label position
+        </button>
+      )}
+
+      <div className="flex justify-between pt-4">
         <button
           onClick={remove}
           className="px-3 py-1.5 text-sm rounded bg-red-50 hover:bg-red-100 text-red-700 font-medium"

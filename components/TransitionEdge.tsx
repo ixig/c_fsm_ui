@@ -4,13 +4,16 @@ import {
   BaseEdge,
   EdgeLabelRenderer,
   getBezierPath,
+  useReactFlow,
   type EdgeProps,
 } from "@xyflow/react";
-import { memo } from "react";
+import { memo, useRef } from "react";
 import type { TransitionEdge as TEdge } from "@/lib/types";
+import { useFsmStore } from "@/lib/store";
 
 function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
   const {
+    id,
     data,
     sourceX,
     sourceY,
@@ -22,6 +25,9 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     selected,
   } = props;
 
+  const { screenToFlowPosition } = useReactFlow();
+  const updateTransition = useFsmStore((s) => s.updateTransition);
+
   const [path, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -30,6 +36,59 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     sourcePosition,
     targetPosition,
   });
+
+  const isDragging = useRef(false);
+
+  const onMouseDown = (event: React.MouseEvent) => {
+    if (event.button !== 0) return;
+    event.stopPropagation();
+    isDragging.current = false;
+
+    const startPos = screenToFlowPosition({
+      x: event.clientX,
+      y: event.clientY,
+    });
+
+    const initialOffset = data?.labelOffset || { x: 0, y: 0 };
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const currentPos = screenToFlowPosition({
+        x: moveEvent.clientX,
+        y: moveEvent.clientY,
+      });
+
+      if (
+        Math.abs(moveEvent.clientX - event.clientX) > 2 ||
+        Math.abs(moveEvent.clientY - event.clientY) > 2
+      ) {
+        isDragging.current = true;
+      }
+
+      updateTransition(id, {
+        labelOffset: {
+          x: initialOffset.x + (currentPos.x - startPos.x),
+          y: initialOffset.y + (currentPos.y - startPos.y),
+        },
+      });
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  };
+
+  const onLabelClick = (event: React.MouseEvent) => {
+    if (isDragging.current) {
+      event.stopPropagation();
+    }
+  };
+
+  const offsetX = data?.labelOffset?.x || 0;
+  const offsetY = data?.labelOffset?.y || 0;
 
   return (
     <>
@@ -47,10 +106,12 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
           <div
             style={{
               position: "absolute",
-              transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
+              transform: `translate(-50%, -50%) translate(${labelX + offsetX}px, ${labelY + offsetY}px)`,
               pointerEvents: "all",
             }}
-            className="nodrag nopan bg-white px-2 py-1 text-[11px] font-mono rounded border border-neutral-200 shadow-sm flex flex-col items-center leading-tight"
+            onMouseDown={onMouseDown}
+            onClick={onLabelClick}
+            className="nopan bg-white px-2 py-1 text-[11px] font-mono rounded border border-neutral-200 shadow-sm flex flex-col items-center leading-tight cursor-move select-none"
           >
             {data?.trigger && <div>{data.trigger}</div>}
             {data?.guard && <div className="text-neutral-500">[{data.guard}]</div>}

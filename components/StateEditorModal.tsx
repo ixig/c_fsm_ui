@@ -118,6 +118,14 @@ export function ModalShell({
   title: string;
   children: React.ReactNode;
 }) {
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState<{
+    startX: number;
+    startY: number;
+    startOffsetX: number;
+    startOffsetY: number;
+  } | null>(null);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -126,6 +134,40 @@ export function ModalShell({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!dragging) return;
+
+    const onMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
+      setOffset({
+        x: dragging.startOffsetX + (e.clientX - dragging.startX),
+        y: dragging.startOffsetY + (e.clientY - dragging.startY),
+      });
+    };
+
+    const onMouseUp = () => {
+      setDragging(null);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [dragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    setDragging({
+      startX: e.clientX,
+      startY: e.clientY,
+      startOffsetX: offset.x,
+      startOffsetY: offset.y,
+    });
+    e.stopPropagation();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
@@ -133,9 +175,17 @@ export function ModalShell({
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}
+        style={{
+          transform: `translate(${offset.x}px, ${offset.y}px)`,
+        }}
         className="bg-white rounded-lg shadow-xl w-[380px] p-5 flex flex-col gap-3"
       >
-        <h2 className="text-base font-semibold text-neutral-900">{title}</h2>
+        <h2
+          onMouseDown={handleMouseDown}
+          className="text-base font-semibold text-neutral-900 cursor-move select-none"
+        >
+          {title}
+        </h2>
         {children}
       </div>
     </div>

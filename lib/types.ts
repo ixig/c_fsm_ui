@@ -11,6 +11,7 @@ export type TransitionEdgeData = {
   trigger: string;
   guard?: string;
   action?: string;
+  labelOffset?: { x: number; y: number };
 };
 
 export type StateNode = Node<StateNodeData, "state">;
@@ -35,5 +36,6 @@ export type FsmExport = {
     trigger: string;
     guard?: string;
     action?: string;
+    labelOffset?: { x: number; y: number };
   }[];
 };

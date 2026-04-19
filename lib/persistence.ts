@@ -30,6 +30,7 @@ export function exportJson(
       trigger: e.data?.trigger ?? "",
       guard: e.data?.guard,
       action: e.data?.action,
+      labelOffset: e.data?.labelOffset,
     })),
   };
 }
@@ -67,6 +68,7 @@ export function importJson(raw: unknown): {
       trigger: t.trigger ?? "",
       guard: t.guard,
       action: t.action,
+      labelOffset: t.labelOffset,
     },
   }));
   return { nodes, edges };
