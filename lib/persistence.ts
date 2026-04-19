@@ -18,6 +18,7 @@ export function exportJson(
       name: n.data.name,
       onEnter: n.data.onEnter,
       onExit: n.data.onExit,
+      timeout_ms: n.data.timeout_ms,
       isInitial: n.data.isInitial,
       position: { x: n.position.x, y: n.position.y },
     })),
@@ -27,6 +28,7 @@ export function exportJson(
       to: e.target,
       sourceHandle: e.sourceHandle ?? null,
       targetHandle: e.targetHandle ?? null,
+      priority: e.data?.priority,
       trigger: e.data?.trigger ?? "",
       guard: e.data?.guard,
       action: e.data?.action,
@@ -53,6 +55,7 @@ export function importJson(raw: unknown): {
       name: s.name,
       onEnter: s.onEnter,
       onExit: s.onExit,
+      timeout_ms: s.timeout_ms,
       isInitial: s.isInitial,
     },
   }));
@@ -65,6 +68,7 @@ export function importJson(raw: unknown): {
     type: "transition",
     markerEnd: { type: MarkerType.ArrowClosed, color: "#334155" },
     data: {
+      priority: t.priority,
       trigger: t.trigger ?? "",
       guard: t.guard,
       action: t.action,

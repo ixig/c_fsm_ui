@@ -26,12 +26,14 @@ export function TransitionEditorModal() {
   const updateTransition = useFsmStore((s) => s.updateTransition);
   const deleteTransition = useFsmStore((s) => s.deleteTransition);
 
+  const [priority, setPriority] = useState<string>("");
   const [trigger, setTrigger] = useState("");
   const [guard, setGuard] = useState("");
   const [action, setAction] = useState("");
 
   useEffect(() => {
     if (edge) {
+      setPriority(edge.data?.priority !== undefined ? String(edge.data.priority) : "");
       setTrigger(edge.data?.trigger ?? "");
       setGuard(edge.data?.guard ?? "");
       setAction(edge.data?.action ?? "");
@@ -41,7 +43,9 @@ export function TransitionEditorModal() {
   if (modal.kind !== "transition" || !edge) return null;
 
   const save = () => {
+    const parsed = parseInt(priority, 10);
     updateTransition(edge.id, {
+      priority: priority.trim() !== "" && !isNaN(parsed) && parsed >= 0 ? parsed : undefined,
       trigger: trigger.trim(),
       guard: guard.trim() || undefined,
       action: action.trim() || undefined,
@@ -64,6 +68,17 @@ export function TransitionEditorModal() {
         {" → "}
         <span className="font-medium">{targetName}</span>
       </p>
+      <Field label="priority">
+        <input
+          type="number"
+          min={0}
+          step={1}
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          placeholder="e.g. 0"
+          className="w-full border border-neutral-300 rounded px-2 py-1 text-sm font-mono"
+        />
+      </Field>
       <Field label="trigger (event name)">
         <input
           autoFocus

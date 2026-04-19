@@ -134,7 +134,12 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
               isHighlighted ? "border-blue-400" : "border-neutral-200 hover:border-blue-300"
             }`}
           >
-            {data?.trigger && <div>{data.trigger}</div>}
+            {data?.trigger && (
+              <div>
+                {data.priority !== undefined ? `#${data.priority}: ` : ""}
+                {data.trigger}
+              </div>
+            )}
             {data?.guard && <div className="text-neutral-500">[{data.guard}]</div>}
             {data?.action && <div className="text-neutral-600">{data.action}</div>}
           </div>

@@ -4,10 +4,12 @@ export type StateNodeData = {
   name: string;
   onEnter?: string;
   onExit?: string;
+  timeout_ms?: number;
   isInitial?: boolean;
 };
 
 export type TransitionEdgeData = {
+  priority?: number;
   trigger: string;
   guard?: string;
   action?: string;
@@ -24,6 +26,7 @@ export type FsmExport = {
     name: string;
     onEnter?: string;
     onExit?: string;
+    timeout_ms?: number;
     isInitial?: boolean;
     position: { x: number; y: number };
   }[];
@@ -33,6 +36,7 @@ export type FsmExport = {
     to: string;
     sourceHandle?: string | null;
     targetHandle?: string | null;
+    priority?: number;
     trigger: string;
     guard?: string;
     action?: string;

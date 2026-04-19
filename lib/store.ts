@@ -76,20 +76,23 @@ export const useFsmStore = create<FsmStore>((set, get) => ({
 
   onConnect: (connection) => {
     const id = nanoid(8);
-    const edge: TransitionEdge = {
-      id,
-      source: connection.source!,
-      target: connection.target!,
-      sourceHandle: connection.sourceHandle ?? undefined,
-      targetHandle: connection.targetHandle ?? undefined,
-      type: "transition",
-      markerEnd: { type: MarkerType.ArrowClosed, color: "#334155" },
-      data: { trigger: "" },
-    };
-    set((s) => ({
-      edges: addEdge(edge, s.edges) as TransitionEdge[],
-      modal: { kind: "transition", edgeId: id },
-    }));
+    set((s) => {
+      const priority = s.edges.filter((e) => e.source === connection.source).length;
+      const edge: TransitionEdge = {
+        id,
+        source: connection.source!,
+        target: connection.target!,
+        sourceHandle: connection.sourceHandle ?? undefined,
+        targetHandle: connection.targetHandle ?? undefined,
+        type: "transition",
+        markerEnd: { type: MarkerType.ArrowClosed, color: "#334155" },
+        data: { priority, trigger: "" },
+      };
+      return {
+        edges: addEdge(edge, s.edges) as TransitionEdge[],
+        modal: { kind: "transition", edgeId: id },
+      };
+    });
   },
 
   addState: (name, position) => {

@@ -18,6 +18,7 @@ export function StateEditorModal() {
   const [name, setName] = useState("");
   const [onEnter, setOnEnter] = useState("");
   const [onExit, setOnExit] = useState("");
+  const [timeoutMs, setTimeoutMs] = useState("");
   const [isInitial, setIsInitial] = useState(false);
 
   useEffect(() => {
@@ -25,6 +26,7 @@ export function StateEditorModal() {
       setName(node.data.name);
       setOnEnter(node.data.onEnter ?? "");
       setOnExit(node.data.onExit ?? "");
+      setTimeoutMs(node.data.timeout_ms !== undefined ? String(node.data.timeout_ms) : "");
       setIsInitial(!!node.data.isInitial);
     }
   }, [node]);
@@ -32,10 +34,12 @@ export function StateEditorModal() {
   if (modal.kind !== "state" || !node) return null;
 
   const save = () => {
+    const parsedTimeout = parseInt(timeoutMs, 10);
     updateState(node.id, {
       name: name.trim() || node.data.name,
       onEnter: onEnter.trim() || undefined,
       onExit: onExit.trim() || undefined,
+      timeout_ms: timeoutMs.trim() && parsedTimeout > 0 ? parsedTimeout : undefined,
     });
     if (isInitial && !node.data.isInitial) setInitialState(node.id);
     else if (!isInitial && node.data.isInitial) setInitialState(null);
@@ -71,6 +75,14 @@ export function StateEditorModal() {
           value={onExit}
           onChange={(e) => setOnExit(e.target.value)}
           placeholder="e.g. cleanup"
+          className="w-full border border-neutral-300 rounded px-2 py-1 text-sm font-mono"
+        />
+      </Field>
+      <Field label="timeout_ms (positive integer, optional)">
+        <input
+          value={timeoutMs}
+          onChange={(e) => setTimeoutMs(e.target.value.replace(/\D/g, "").replace(/^0+/, ""))}
+          placeholder="e.g. 5000"
           className="w-full border border-neutral-300 rounded px-2 py-1 text-sm font-mono"
         />
       </Field>
