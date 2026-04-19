@@ -11,9 +11,6 @@ importers:
       '@xyflow/react':
         specifier: ^12.10.2
         version: 12.10.2(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      elkjs:
-        specifier: ^0.11.1
-        version: 0.11.1
       nanoid:
         specifier: ^5.1.9
         version: 5.1.9
@@ -998,9 +995,6 @@ packages:
 
   electron-to-chromium@1.5.340:
     resolution: {integrity: sha512-908qahOGocRMinT2nM3ajCEM99H4iPdv84eagPP3FfZy/1ZGeOy2CZYzjhms81ckOPCXPlW7LkY4XpxD8r1DrA==}
-
-  elkjs@0.11.1:
-    resolution: {integrity: sha512-zxxR9k+rx5ktMwT/FwyLdPCrq7xN6e4VGGHH8hA01vVYKjTFik7nHOxBnAYtrgYUB1RpAiLvA1/U2YraWxyKKg==}
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
@@ -2987,8 +2981,6 @@ snapshots:
       gopd: 1.2.0
 
   electron-to-chromium@1.5.340: {}
-
-  elkjs@0.11.1: {}
 
   emoji-regex@9.2.2: {}
 

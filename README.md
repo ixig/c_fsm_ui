@@ -20,7 +20,6 @@ There is no test suite.
 - **States** — add via the toolbar, rename, edit `onEnter` / `onExit` actions, mark one as the initial state
 - **Transitions** — drag from a node handle to another to connect; edit `trigger`, `guard`, and `action` in the modal
 - **Self-loops** — drag a handle back onto the same node
-- **Orthogonal edge routing** — custom A* pathfinder on a 10px grid avoids nodes with a turn penalty, debounced at 80 ms
 - **Persistence** — diagram auto-saves to `localStorage` (`c_fsm_ui.fsm.v1`) on change and rehydrates on load
 - **Import / Export** — round-trip the diagram as JSON via the toolbar
 
@@ -32,7 +31,6 @@ components/          FsmEditor, StateNode, TransitionEdge, Toolbar, modals
 lib/
   types.ts           StateNode, TransitionEdge, FsmExport types
   store.ts           Zustand store (useFsmStore) — single source of truth
-  routing.ts         A* edge router + useEdgeRouting hook
   persistence.ts     localStorage hydration + JSON import/export
 ```
 
