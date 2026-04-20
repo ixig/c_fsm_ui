@@ -2,7 +2,7 @@
 
 A visual finite-state machine editor — drag-and-drop states, connect transitions, edit triggers/guards/actions, and import/export the diagram as JSON.
 
-Built with Next.js 16, React 19, [React Flow](https://reactflow.dev/) (`@xyflow/react`), Zustand, and Tailwind CSS 4.
+Built with Next.js 16, React 19, React Flow (`@xyflow/react`), Zustand, and Tailwind CSS 4.
 
 ## Getting started
 
@@ -30,9 +30,8 @@ There is no test suite.
 app/                 Next.js App Router entry (layout, page, globals)
 components/          FsmEditor, StateNode, TransitionEdge, Toolbar, modals
 lib/
+  constants.ts       STATE_NODE_WIDTH, STATE_NODE_HEIGHT, GRID_SIZE
   types.ts           StateNode, TransitionEdge, FsmExport types
   store.ts           Zustand store (useFsmStore) — single source of truth
   persistence.ts     localStorage hydration + JSON import/export
 ```
-
-See `CLAUDE.md` for architectural detail.

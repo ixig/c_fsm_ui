@@ -28,6 +28,9 @@ Single-page React app — a visual finite-state machine (FSM) editor built on **
 ### State (`lib/store.ts`)
 Single Zustand store `useFsmStore` owns all nodes, edges, and modal state. All mutations go through store actions — components never mutate nodes/edges directly.
 
+### Constants (`lib/constants.ts`)
+`STATE_NODE_WIDTH`, `STATE_NODE_HEIGHT`, `GRID_SIZE` — shared layout constants used across nodes and the editor canvas.
+
 ### Persistence (`lib/persistence.ts`)
 `usePersistence()` hook hydrates from `localStorage` (`c_fsm_ui.fsm.v1`) on mount, then debounces saves (300 ms) on any node/edge change. `exportJson`/`importJson` convert between store state and the `FsmExport` wire format.
 
