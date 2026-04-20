@@ -33,6 +33,7 @@ function FsmEditorInner() {
   const onConnect = useFsmStore((s) => s.onConnect);
   const openStateModal = useFsmStore((s) => s.openStateModal);
   const openTransitionModal = useFsmStore((s) => s.openTransitionModal);
+  const setHoveredEdge = useFsmStore((s) => s.setHoveredEdge);
 
   usePersistence();
 
@@ -62,6 +63,8 @@ function FsmEditorInner() {
         onNodeDragStop={handleNodeDragStop}
         onNodeClick={handleNodeClick}
         onEdgeClick={handleEdgeClick}
+        onEdgeMouseEnter={(_, edge) => setHoveredEdge(edge.id)}
+        onEdgeMouseLeave={() => setHoveredEdge(null)}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         snapToGrid={true}

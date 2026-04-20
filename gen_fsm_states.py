@@ -26,6 +26,19 @@ def generate(fsm_path):
     by_from = defaultdict(list)
     for t in fsm["transitions"]:
         by_from[t["from"]].append(t)
+    errors = []
+    for sid, lst in by_from.items():
+        priorities = [t["priority"] for t in lst]
+        seen = set()
+        for p in priorities:
+            if p in seen:
+                errors.append(f"State '{id_to_name[sid]}' has multiple transitions with priority {p}")
+            seen.add(p)
+    if errors:
+        for e in errors:
+            print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
     for lst in by_from.values():
         lst.sort(key=lambda t: t["priority"])
 
