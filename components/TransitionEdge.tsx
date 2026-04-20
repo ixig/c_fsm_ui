@@ -25,7 +25,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     selected,
   } = props;
 
-  const { screenToFlowPosition } = useReactFlow();
+  const { getViewport } = useReactFlow();
   const updateTransition = useFsmStore((s) => s.updateTransition);
   const setHoveredEdge = useFsmStore((s) => s.setHoveredEdge);
   const hoveredEdgeId = useFsmStore((s) => s.hoveredEdgeId);
@@ -42,6 +42,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     targetY,
     sourcePosition,
     targetPosition,
+    curvature: 0.4,
   });
 
   const isDragging = useRef(false);
@@ -51,19 +52,9 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
     event.stopPropagation();
     isDragging.current = false;
 
-    const startPos = screenToFlowPosition({
-      x: event.clientX,
-      y: event.clientY,
-    });
-
     const initialOffset = data?.labelOffset || { x: 0, y: 0 };
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const currentPos = screenToFlowPosition({
-        x: moveEvent.clientX,
-        y: moveEvent.clientY,
-      });
-
       if (
         Math.abs(moveEvent.clientX - event.clientX) > 2 ||
         Math.abs(moveEvent.clientY - event.clientY) > 2
@@ -71,10 +62,12 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
         isDragging.current = true;
       }
 
+      const { zoom } = getViewport();
+      const snap = (v: number) => Math.round(v / 10) * 10;
       updateTransition(id, {
         labelOffset: {
-          x: initialOffset.x + (currentPos.x - startPos.x),
-          y: initialOffset.y + (currentPos.y - startPos.y),
+          x: snap(initialOffset.x + (moveEvent.clientX - event.clientX) / zoom),
+          y: snap(initialOffset.y + (moveEvent.clientY - event.clientY) / zoom),
         },
       });
     };
