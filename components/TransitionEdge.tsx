@@ -125,6 +125,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
               <div>
                 {data.priority !== undefined ? `#${data.priority}: ` : ""}
                 {data.trigger}
+                {data.internal ? " ◯" : ""}
               </div>
             )}
             {data?.guard && <div className="text-neutral-500">[{data.guard}]</div>}

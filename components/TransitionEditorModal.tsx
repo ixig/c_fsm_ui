@@ -33,6 +33,7 @@ export function TransitionEditorModal() {
   const [trigger, setTrigger] = useState("");
   const [guard, setGuard] = useState("");
   const [action, setAction] = useState("");
+  const [internal, setInternal] = useState(false);
 
   useEffect(() => {
     if (edge) {
@@ -41,11 +42,14 @@ export function TransitionEditorModal() {
       setTrigger(edge.data?.trigger ?? "");
       setGuard(edge.data?.guard ?? "");
       setAction(edge.data?.action ?? "");
+      setInternal(edge.data?.internal ?? false);
       /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [edge]);
 
   if (modal.kind !== "transition" || !edge) return null;
+
+  const isSelfLoop = edge.source === edge.target;
 
   const save = () => {
     const parsed = parseInt(priority, 10);
@@ -54,6 +58,7 @@ export function TransitionEditorModal() {
       trigger: trigger.trim(),
       guard: guard.trim() || undefined,
       action: action.trim() || undefined,
+      internal: isSelfLoop && internal || undefined,
     });
     closeModal();
   };
@@ -84,6 +89,16 @@ export function TransitionEditorModal() {
           className="w-full border border-neutral-300 rounded px-2 py-1 text-sm font-mono"
         />
       </Field>
+      <label className={`flex items-center gap-2 text-sm ${isSelfLoop ? "text-neutral-700" : "text-neutral-300 cursor-not-allowed"}`}>
+        <input
+          type="checkbox"
+          checked={internal}
+          onChange={(e) => setInternal(e.target.checked)}
+          disabled={!isSelfLoop}
+          className="rounded border-neutral-300"
+        />
+        <span>Internal (no on_exit / on_enter, no timer reset)</span>
+      </label>
       <Field label="trigger (event name)">
         <input
           autoFocus

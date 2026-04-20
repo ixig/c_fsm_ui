@@ -13,6 +13,7 @@ export type TransitionEdgeData = {
   trigger: string;
   guard?: string;
   action?: string;
+  internal?: boolean;
   labelOffset?: { x: number; y: number };
 };
 
@@ -20,7 +21,7 @@ export type StateNode = Node<StateNodeData, "state">;
 export type TransitionEdge = Edge<TransitionEdgeData, "transition">;
 
 export type FsmExport = {
-  version: 2;
+  version: 3;
   states: {
     id: string;
     name: string;
@@ -40,6 +41,7 @@ export type FsmExport = {
     trigger: string;
     guard?: string;
     action?: string;
+    internal?: boolean;
     labelOffset?: { x: number; y: number };
   }[];
 };

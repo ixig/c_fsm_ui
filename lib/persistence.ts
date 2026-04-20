@@ -5,16 +5,16 @@ import { MarkerType } from "@xyflow/react";
 import { useFsmStore } from "./store";
 import type { FsmExport, StateNode, TransitionEdge } from "./types";
 
-import { STATE_NODE_WIDTH, STATE_NODE_HEIGHT, GRID_SIZE } from "./constants";
+import { GRID_SIZE } from "./constants";
 
-const STORAGE_KEY = "c_fsm_ui.fsm.v2"; // Changed key to avoid confusion with v1
+const STORAGE_KEY = "c_fsm_ui.fsm.v3";
 
 export function exportJson(
   nodes: StateNode[],
   edges: TransitionEdge[],
 ): FsmExport {
   return {
-    version: 2,
+    version: 3,
     states: nodes.map((n) => ({
       id: n.id,
       name: n.data.name,
@@ -34,6 +34,7 @@ export function exportJson(
       trigger: e.data?.trigger ?? "",
       guard: e.data?.guard,
       action: e.data?.action,
+      internal: e.data?.internal,
       labelOffset: e.data?.labelOffset,
     })),
   };
@@ -45,9 +46,9 @@ export function importJson(raw: unknown): {
 } {
   if (!raw || typeof raw !== "object") throw new Error("Invalid FSM JSON");
   const fsm = raw as Record<string, unknown>;
-  const version = (fsm.version as number) || 1;
-  if (version !== 1 && version !== 2) throw new Error(`Unsupported version: ${version}`);
-  
+  const version = fsm.version as number;
+  if (version !== 3) throw new Error(`Unsupported version: ${version}`);
+
   const states = fsm.states;
   const transitions = fsm.transitions;
 
@@ -57,15 +58,9 @@ export function importJson(raw: unknown): {
 
   const nodes: StateNode[] = states.map((s_raw) => {
     const s = s_raw as Record<string, unknown>;
-    const rawPosition = s.position as { x: number; y: number };
-    const position = { ...rawPosition };
-    if (version === 1) {
-      // Migrate from top-left to center origin
-      position.x += STATE_NODE_WIDTH / 2;
-      position.y += STATE_NODE_HEIGHT / 2;
-    }
-    
-    // Always snap to grid on import for robustness
+    const position = { ...(s.position as { x: number; y: number }) };
+
+    // Snap to grid on import
     position.x = Math.round(position.x / GRID_SIZE) * GRID_SIZE;
     position.y = Math.round(position.y / GRID_SIZE) * GRID_SIZE;
 
@@ -98,6 +93,7 @@ export function importJson(raw: unknown): {
         trigger: (t.trigger as string) ?? "",
         guard: t.guard as string | undefined,
         action: t.action as string | undefined,
+        internal: t.internal as boolean | undefined,
         labelOffset: t.labelOffset as { x: number; y: number } | undefined,
       },
     };
@@ -116,13 +112,9 @@ export function usePersistence() {
     if (hydratedRef.current) return;
     hydratedRef.current = true;
     try {
-      // Try v2 first, then fallback to v1 for migration
-      let raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        raw = window.localStorage.getItem("c_fsm_ui.fsm.v1");
-      }
+      const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(raw) as Parameters<typeof importJson>[0];
       const { nodes, edges } = importJson(parsed);
       replaceAll(nodes, edges);
     } catch {
