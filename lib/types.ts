@@ -20,7 +20,7 @@ export type StateNode = Node<StateNodeData, "state">;
 export type TransitionEdge = Edge<TransitionEdgeData, "transition">;
 
 export type FsmExport = {
-  version: 1;
+  version: 2;
   states: {
     id: string;
     name: string;

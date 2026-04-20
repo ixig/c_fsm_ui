@@ -18,6 +18,8 @@ import type {
   TransitionEdgeData,
 } from "./types";
 
+import { GRID_SIZE } from "./constants";
+
 export type ModalState =
   | { kind: "none" }
   | { kind: "state"; nodeId: string }
@@ -98,10 +100,17 @@ export const useFsmStore = create<FsmStore>((set, get) => ({
   addState: (name, position) => {
     const id = nanoid(8);
     const hasInitial = get().nodes.some((n) => n.data.isInitial);
+    
+    // Snap to grid for extra safety
+    const snappedPosition = {
+      x: Math.round(position.x / GRID_SIZE) * GRID_SIZE,
+      y: Math.round(position.y / GRID_SIZE) * GRID_SIZE,
+    };
+
     const node: StateNode = {
       id,
       type: "state",
-      position,
+      position: snappedPosition,
       data: { name, isInitial: !hasInitial },
     };
     set((s) => ({ nodes: [...s.nodes, node] }));

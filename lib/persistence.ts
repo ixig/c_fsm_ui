@@ -5,14 +5,16 @@ import { MarkerType } from "@xyflow/react";
 import { useFsmStore } from "./store";
 import type { FsmExport, StateNode, TransitionEdge } from "./types";
 
-const STORAGE_KEY = "c_fsm_ui.fsm.v1";
+import { STATE_NODE_WIDTH, STATE_NODE_HEIGHT, GRID_SIZE } from "./constants";
+
+const STORAGE_KEY = "c_fsm_ui.fsm.v2"; // Changed key to avoid confusion with v1
 
 export function exportJson(
   nodes: StateNode[],
   edges: TransitionEdge[],
 ): FsmExport {
   return {
-    version: 1,
+    version: 2,
     states: nodes.map((n) => ({
       id: n.id,
       name: n.data.name,
@@ -42,39 +44,64 @@ export function importJson(raw: unknown): {
   edges: TransitionEdge[];
 } {
   if (!raw || typeof raw !== "object") throw new Error("Invalid FSM JSON");
-  const fsm = raw as Partial<FsmExport>;
-  if (fsm.version !== 1) throw new Error("Unsupported version");
-  if (!Array.isArray(fsm.states) || !Array.isArray(fsm.transitions)) {
+  const fsm = raw as Record<string, unknown>;
+  const version = (fsm.version as number) || 1;
+  if (version !== 1 && version !== 2) throw new Error(`Unsupported version: ${version}`);
+  
+  const states = fsm.states;
+  const transitions = fsm.transitions;
+
+  if (!Array.isArray(states) || !Array.isArray(transitions)) {
     throw new Error("Missing states or transitions");
   }
-  const nodes: StateNode[] = fsm.states.map((s) => ({
-    id: s.id,
-    type: "state",
-    position: s.position,
-    data: {
-      name: s.name,
-      onEnter: s.onEnter,
-      onExit: s.onExit,
-      timeout_ms: s.timeout_ms,
-      isInitial: s.isInitial,
-    },
-  }));
-  const edges: TransitionEdge[] = fsm.transitions.map((t) => ({
-    id: t.id,
-    source: t.from,
-    target: t.to,
-    sourceHandle: t.sourceHandle ?? undefined,
-    targetHandle: t.targetHandle ?? undefined,
-    type: "transition",
-    markerEnd: { type: MarkerType.ArrowClosed, color: "#334155" },
-    data: {
-      priority: t.priority,
-      trigger: t.trigger ?? "",
-      guard: t.guard,
-      action: t.action,
-      labelOffset: t.labelOffset,
-    },
-  }));
+
+  const nodes: StateNode[] = states.map((s_raw) => {
+    const s = s_raw as Record<string, unknown>;
+    const rawPosition = s.position as { x: number; y: number };
+    const position = { ...rawPosition };
+    if (version === 1) {
+      // Migrate from top-left to center origin
+      position.x += STATE_NODE_WIDTH / 2;
+      position.y += STATE_NODE_HEIGHT / 2;
+    }
+    
+    // Always snap to grid on import for robustness
+    position.x = Math.round(position.x / GRID_SIZE) * GRID_SIZE;
+    position.y = Math.round(position.y / GRID_SIZE) * GRID_SIZE;
+
+    return {
+      id: s.id as string,
+      type: "state",
+      position,
+      data: {
+        name: s.name as string,
+        onEnter: s.onEnter as string | undefined,
+        onExit: s.onExit as string | undefined,
+        timeout_ms: s.timeout_ms as number | undefined,
+        isInitial: s.isInitial as boolean | undefined,
+      },
+    };
+  });
+
+  const edges: TransitionEdge[] = transitions.map((t_raw) => {
+    const t = t_raw as Record<string, unknown>;
+    return {
+      id: t.id as string,
+      source: t.from as string,
+      target: t.to as string,
+      sourceHandle: (t.sourceHandle as string | null) ?? undefined,
+      targetHandle: (t.targetHandle as string | null) ?? undefined,
+      type: "transition",
+      markerEnd: { type: MarkerType.ArrowClosed, color: "#334155" },
+      data: {
+        priority: t.priority as number | undefined,
+        trigger: (t.trigger as string) ?? "",
+        guard: t.guard as string | undefined,
+        action: t.action as string | undefined,
+        labelOffset: t.labelOffset as { x: number; y: number } | undefined,
+      },
+    };
+  });
   return { nodes, edges };
 }
 
@@ -89,7 +116,11 @@ export function usePersistence() {
     if (hydratedRef.current) return;
     hydratedRef.current = true;
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      // Try v2 first, then fallback to v1 for migration
+      let raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        raw = window.localStorage.getItem("c_fsm_ui.fsm.v1");
+      }
       if (!raw) return;
       const parsed = JSON.parse(raw);
       const { nodes, edges } = importJson(parsed);

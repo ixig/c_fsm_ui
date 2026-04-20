@@ -5,6 +5,8 @@ import { useReactFlow } from "@xyflow/react";
 import { useFsmStore } from "@/lib/store";
 import { exportJson, importJson } from "@/lib/persistence";
 
+import { GRID_SIZE } from "@/lib/constants";
+
 export function Toolbar() {
   const rf = useReactFlow();
   const addState = useFsmStore((s) => s.addState);
@@ -20,15 +22,20 @@ export function Toolbar() {
       window.alert(`A state named "${name}" already exists.`);
       return;
     }
-    const { x, y, zoom } = rf.getViewport();
-    const bounds =
-      typeof window !== "undefined"
-        ? { w: window.innerWidth, h: window.innerHeight }
-        : { w: 800, h: 600 };
-    const cx = (bounds.w / 2 - x) / zoom;
-    const cy = (bounds.h / 2 - y) / zoom;
-    const jitter = () => (Math.random() - 0.5) * 80;
-    addState(name, { x: cx + jitter() - 80, y: cy + jitter() - 32 });
+    // Get the container element and calculate its screen center
+    const container = document.querySelector(".react-flow");
+    if (!container) return;
+    
+    const rect = container.getBoundingClientRect();
+    const centerFlow = rf.screenToFlowPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+    
+    const snappedX = Math.round(centerFlow.x / GRID_SIZE) * GRID_SIZE;
+    const snappedY = Math.round(centerFlow.y / GRID_SIZE) * GRID_SIZE;
+    
+    addState(name, { x: snappedX, y: snappedY });
   };
 
   const handleExport = () => {

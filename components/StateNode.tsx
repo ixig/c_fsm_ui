@@ -5,8 +5,7 @@ import { memo } from "react";
 import type { StateNode as StateNodeType } from "@/lib/types";
 import { useFsmStore } from "@/lib/store";
 
-export const STATE_NODE_MIN_WIDTH = 160;
-export const STATE_NODE_MIN_HEIGHT = 64;
+import { STATE_NODE_WIDTH, STATE_NODE_HEIGHT } from "@/lib/constants";
 
 function StateNodeImpl({ id, data, selected }: NodeProps<StateNodeType>) {
   const setHoveredNode = useFsmStore((s) => s.setHoveredNode);
@@ -18,7 +17,7 @@ function StateNodeImpl({ id, data, selected }: NodeProps<StateNodeType>) {
       className={`relative rounded-xl border-2 bg-white shadow-sm flex items-center justify-center text-center px-5 py-3 transition-colors ${
         selected ? "border-blue-500" : "border-neutral-700 hover:border-blue-400"
       }`}
-      style={{ minWidth: STATE_NODE_MIN_WIDTH, minHeight: STATE_NODE_MIN_HEIGHT }}
+      style={{ minWidth: STATE_NODE_WIDTH, minHeight: STATE_NODE_HEIGHT }}
     >
       {data.isInitial && (
         <span

@@ -23,7 +23,7 @@ import { usePersistence } from "@/lib/persistence";
 
 const nodeTypes: NodeTypes = { state: StateNode };
 const edgeTypes: EdgeTypes = { transition: TransitionEdge };
-const GRID_SIZE = 20;
+import { GRID_SIZE } from "@/lib/constants";
 
 function FsmEditorInner() {
   const nodes = useFsmStore((s) => s.nodes);
@@ -31,18 +31,13 @@ function FsmEditorInner() {
   const onNodesChange = useFsmStore((s) => s.onNodesChange);
   const onEdgesChange = useFsmStore((s) => s.onEdgesChange);
   const onConnect = useFsmStore((s) => s.onConnect);
-  const setNodes = useFsmStore((s) => s.setNodes);
   const openStateModal = useFsmStore((s) => s.openStateModal);
   const openTransitionModal = useFsmStore((s) => s.openTransitionModal);
 
   usePersistence();
 
-  const handleNodeDragStop = (_: React.MouseEvent, node: Node) => {
-    const snappedX = Math.round(node.position.x / GRID_SIZE) * GRID_SIZE;
-    const snappedY = Math.round(node.position.y / GRID_SIZE) * GRID_SIZE;
-    if (snappedX !== node.position.x || snappedY !== node.position.y) {
-      setNodes(nodes.map((n) => n.id === node.id ? { ...n, position: { x: snappedX, y: snappedY } } : n));
-    }
+  const handleNodeDragStop = () => {
+    // Snapping is handled by ReactFlow snapToGrid + nodeOrigin={[0.5, 0.5]}
   };
 
   const handleNodeClick = (_: React.MouseEvent, node: Node) => {
@@ -69,10 +64,13 @@ function FsmEditorInner() {
         onEdgeClick={handleEdgeClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        snapToGrid={true}
+        snapGrid={[GRID_SIZE, GRID_SIZE]}
+        nodeOrigin={[0.5, 0.5]}
         fitView
         proOptions={{ hideAttribution: true }}
       >
-        <Background />
+        <Background gap={GRID_SIZE} />
         <Controls />
         <MiniMap pannable zoomable />
       </ReactFlow>
