@@ -2,6 +2,8 @@ app_fsm_states.c
 app_fsm_states1.c
 fsm.json
 
+.claude/
+
 # dependencies
 /node_modules
 /.pnp
