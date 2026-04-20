@@ -15,7 +15,7 @@ function StateNodeImpl({ id, data, selected }: NodeProps<StateNodeType>) {
       onMouseEnter={() => setHoveredNode(id)}
       onMouseLeave={() => setHoveredNode(null)}
       className={`relative rounded-xl border-2 bg-white shadow-sm flex items-center justify-center text-center px-5 py-3 transition-colors ${
-        selected ? "border-blue-500" : "border-neutral-700 hover:border-blue-400"
+        selected ? "border-orange-600" : "border-neutral-700 hover:border-orange-500"
       }`}
       style={{ minWidth: STATE_NODE_WIDTH, minHeight: STATE_NODE_HEIGHT }}
     >

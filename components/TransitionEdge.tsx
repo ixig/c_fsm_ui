@@ -90,7 +90,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
   const offsetX = data?.labelOffset?.x || 0;
   const offsetY = data?.labelOffset?.y || 0;
 
-  const highlightColor = "#2563eb";
+  const highlightColor = "#ea580c";
   const defaultColor = "#334155";
   const strokeColor = isHighlighted ? highlightColor : defaultColor;
 
@@ -118,7 +118,7 @@ function TransitionEdgeImpl(props: EdgeProps<TEdge>) {
             onMouseEnter={() => setHoveredEdge(id)}
             onMouseLeave={() => setHoveredEdge(null)}
             className={`nopan bg-white px-2 py-1 text-[11px] font-mono rounded border shadow-sm flex flex-col items-center leading-tight cursor-move select-none transition-colors ${
-              isHighlighted ? "border-blue-400" : "border-neutral-200 hover:border-blue-300"
+              isHighlighted ? "border-orange-600" : "border-neutral-200 hover:border-orange-400"
             }`}
           >
             {data?.trigger && (
