@@ -24,6 +24,16 @@ There is no test suite.
 - **Persistence** — diagram auto-saves to `localStorage` (`c_fsm_ui.fsm.v1`) on change and rehydrates on load
 - **Import / Export** — round-trip the diagram as JSON via the toolbar
 
+## Code generation
+
+`gen_fsm_states.py` takes an exported FSM JSON file and emits a C `states[]` array suitable for a table-driven FSM engine:
+
+```bash
+python3 gen_fsm_states.py fsm.json > fsm_states.c
+```
+
+Each state maps to a `state_t` entry with `.on_enter`, `.on_exit`, `.timeout_ms`, and a sentinel-terminated `.transitions` array. Transitions are sorted by `priority` and reference state names as enum values (e.g. `ST_IDLE`), so the generated file compiles alongside a matching `state_t` / `transition_t` definition and a `typedef enum { ..., ST_COUNT } state_id_t;`.
+
 ## Project layout
 
 ```
