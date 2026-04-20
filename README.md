@@ -17,9 +17,10 @@ There is no test suite.
 
 ## Features
 
-- **States** — add via the toolbar, rename, edit `onEnter` / `onExit` actions, mark one as the initial state
-- **Transitions** — drag from a node handle to another to connect; edit `trigger`, `guard`, and `action` in the modal
+- **States** — add via the toolbar, rename, edit `onEnter` / `onExit` actions, set `timeout_ms`, mark one as the initial state
+- **Transitions** — drag from a node handle to another to connect; edit `trigger`, `guard`, `action`, and `priority` in the modal; transition label boxes are repositionable
 - **Self-loops** — drag a handle back onto the same node
+- **Hover highlighting** — hovering a state highlights its outbound edges; hovering a transition label highlights the edge
 - **Persistence** — diagram auto-saves to `localStorage` (`c_fsm_ui.fsm.v1`) on change and rehydrates on load
 - **Import / Export** — round-trip the diagram as JSON via the toolbar
 

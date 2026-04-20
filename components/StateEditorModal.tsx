@@ -60,7 +60,7 @@ export function StateEditorModal() {
         <input
           autoFocus
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value.toUpperCase())}
           className="w-full border border-neutral-300 rounded px-2 py-1 text-sm"
         />
       </Field>

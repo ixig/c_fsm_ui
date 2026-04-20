@@ -28,23 +28,26 @@ function StateNodeImpl({ id, data, selected }: NodeProps<StateNodeType>) {
           ▶
         </span>
       )}
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center" style={{ gap: 0 }}>
         <div className="text-sm font-medium text-neutral-900 whitespace-nowrap">
           {data.name || "(unnamed)"}
         </div>
+        {data.onEnter && (
+          <div className="text-[11px] font-mono text-emerald-700 leading-tight whitespace-nowrap">
+            ↳ {data.onEnter}
+          </div>
+        )}
+        {data.onExit && (
+          <div className="text-[11px] font-mono text-rose-700 leading-tight whitespace-nowrap">
+            ↰ {data.onExit}
+          </div>
+        )}
         {data.timeout_ms !== undefined && (
           <div className="text-[11px] font-mono text-neutral-500 leading-tight">
-            ({data.timeout_ms})
+            ⏱ {data.timeout_ms}ms
           </div>
         )}
       </div>
-      {(data.onEnter || data.onExit) && (
-        <div className="absolute -bottom-5 left-0 right-0 text-[10px] text-neutral-500 truncate px-1">
-          {data.onEnter ? `↳ ${data.onEnter}` : ""}
-          {data.onEnter && data.onExit ? " · " : ""}
-          {data.onExit ? `↰ ${data.onExit}` : ""}
-        </div>
-      )}
 
       {(["top", "right", "bottom", "left"] as const).map((side) => {
         const pos =

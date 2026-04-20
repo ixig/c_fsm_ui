@@ -13,7 +13,7 @@ export function Toolbar() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleAdd = () => {
-    const name = window.prompt("State name?");
+    const name = window.prompt("State name?")?.toUpperCase();
     if (!name) return;
     const nodes = useFsmStore.getState().nodes;
     if (nodes.some((n) => n.data.name === name)) {

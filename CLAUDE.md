@@ -21,8 +21,8 @@ This project uses a potentially breaking version of Next.js. **Read `node_module
 Single-page React app — a visual finite-state machine (FSM) editor built on **React Flow** (`@xyflow/react`) with **Zustand** state management.
 
 ### Data model (`lib/types.ts`)
-- `StateNode` — React Flow node with `StateNodeData` (`name`, `onEnter`, `onExit`, `isInitial`)
-- `TransitionEdge` — React Flow edge with `TransitionEdgeData` (`trigger`, `guard`, `action`)
+- `StateNode` — React Flow node with `StateNodeData` (`name`, `onEnter`, `onExit`, `timeout_ms`, `isInitial`)
+- `TransitionEdge` — React Flow edge with `TransitionEdgeData` (`priority`, `trigger`, `guard`, `action`, `labelOffset`)
 - `FsmExport` (version 1) — serialization format for import/export JSON
 
 ### State (`lib/store.ts`)
